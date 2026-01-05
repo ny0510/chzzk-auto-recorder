@@ -35,6 +35,7 @@ class ChzzkRecorder:
         self.monitoring_config = config['monitoring']
         self.session: Optional[aiohttp.ClientSession] = None
         self.channel_names: Dict[str, str] = {}  # channel_id -> channel_name 매핑
+        self.active_locks: set[Path] = set()  # 활성 lockfile 추적
         
     async def start(self):
         logger.info(f"치지직 자동 녹화를 시작합니다.")
@@ -43,6 +44,9 @@ class ChzzkRecorder:
         self.session = aiohttp.ClientSession(headers=headers)
         
         try:
+            # 기존 lockfile 정리
+            self.cleanup_old_lockfiles()
+            
             # 채널 검증
             await self.validate_channels()
             
@@ -55,6 +59,8 @@ class ChzzkRecorder:
         except Exception as e:
             logger.critical(f"오류가 발생하여 프로그램을 종료합니다: {e}")
         finally:
+            # 모든 lockfile 정리
+            self.cleanup_all_lockfiles()
             await self.session.close()
     
     async def validate_channels(self):
@@ -89,6 +95,41 @@ class ChzzkRecorder:
         channel_names_list = ', '.join([self.channel_names[ch_id] for ch_id in self.channels])
         logger.info(f"모니터링 채널 ({len(self.channels)}개): [{channel_names_list}]")
         logger.debug("모든 채널 검증 완료")
+    
+    def cleanup_old_lockfiles(self):
+        """시작 시 기존 lockfile 정리"""
+        try:
+            recordings_path = Path(self.output_config['path'].split('{')[0].strip('./').rstrip('/'))
+            if not recordings_path.exists():
+                return
+            
+            lock_count = 0
+            for lock_file in recordings_path.rglob('*.lock'):
+                try:
+                    lock_file.unlink()
+                    lock_count += 1
+                except Exception as e:
+                    logger.warning(f"lockfile 삭제 실패: {lock_file.name} - {e}")
+            
+            if lock_count > 0:
+                logger.info(f"기존 lockfile {lock_count}개 정리 완료")
+        except Exception as e:
+            logger.warning(f"lockfile 정리 중 오류: {e}")
+    
+    def cleanup_all_lockfiles(self):
+        """종료 시 모든 활성 lockfile 삭제"""
+        if not self.active_locks:
+            return
+        
+        logger.info(f"lockfile 정리 중... ({len(self.active_locks)}개)")
+        for lock_file in list(self.active_locks):
+            try:
+                if lock_file.exists():
+                    lock_file.unlink()
+                    logger.debug(f"lockfile 삭제: {lock_file.name}")
+            except Exception as e:
+                logger.warning(f"lockfile 삭제 실패: {lock_file.name} - {e}")
+        self.active_locks.clear()
     
     async def monitor_channel(self, channel_id: str):
         channel_name = self.channel_names.get(channel_id, channel_id)
@@ -166,6 +207,7 @@ class ChzzkRecorder:
         try:
             # lock 파일 생성
             lock_file.touch()
+            self.active_locks.add(lock_file)
             logger.info(f"[{channel_name}] 방송 시작 감지: {title}")
             
             temp_file = output_path / f"temp_{output_file}"
@@ -222,6 +264,8 @@ class ChzzkRecorder:
             logger.error(f"[{channel_name}] 녹화 오류: {e}")
         finally:
             # lock 파일 삭제
+            if lock_file in self.active_locks:
+                self.active_locks.remove(lock_file)
             if lock_file.exists():
                 lock_file.unlink()
     
