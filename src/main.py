@@ -99,8 +99,12 @@ class ChzzkRecorder:
     def cleanup_old_lockfiles(self):
         """시작 시 기존 lockfile 정리"""
         try:
-            recordings_path = Path(self.output_config['path'].split('{')[0].strip('./').rstrip('/'))
+            # './recordings/{author}/' -> './recordings'
+            base_path = self.output_config['path'].split('{')[0].rstrip('/')
+            recordings_path = Path(base_path).expanduser()
+            
             if not recordings_path.exists():
+                logger.debug(f"녹화 디렉토리가 존재하지 않습니다: {recordings_path}")
                 return
             
             lock_count = 0
@@ -108,6 +112,7 @@ class ChzzkRecorder:
                 try:
                     lock_file.unlink()
                     lock_count += 1
+                    logger.debug(f"lockfile 삭제: {lock_file}")
                 except Exception as e:
                     logger.warning(f"lockfile 삭제 실패: {lock_file.name} - {e}")
             
