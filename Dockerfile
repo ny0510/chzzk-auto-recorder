@@ -15,6 +15,4 @@ COPY src/ ./src/
 RUN uv sync --frozen --no-dev
 RUN uv pip install --system streamlink
 
-RUN mkdir -p /recordings
-
 CMD ["uv", "run", "src/main.py"]
