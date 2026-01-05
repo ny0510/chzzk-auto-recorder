@@ -2,10 +2,9 @@ services:
   chzzk-auto-recoder:
     build: .
     restart: unless-stopped
-    user: '${UID:-1000}:${GID:-1000}'
     volumes:
       - ./config.yaml:/app/config.yaml:ro
-      - ./recordings:/app/recordings
+      - ./recordings:/recordings
     environment:
       - TZ=Asia/Seoul
 
