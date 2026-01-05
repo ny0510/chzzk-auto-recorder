@@ -39,10 +39,8 @@ Thumbs.db
 .git/
 .gitignore
 
-# 프로젝트 관련
 config.yaml
 recordings/
-*.lock*
 *.mp4
 *.log
 

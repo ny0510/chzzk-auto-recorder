@@ -158,7 +158,7 @@ class ChzzkRecorder:
         )
         
         # 중복 녹화 방지
-        lock_file = output_path / f".lock_{channel_id}_{live_id}"
+        lock_file = output_path / f"{output_file}.lock"
         if lock_file.exists():
             logger.info(f"[{channel_name}] 녹화 건너뜀: 이미 녹화 중인 방송입니다.")
             return
