@@ -45,7 +45,10 @@ class ChzzkRecorder:
         
         try:
             # 기존 lockfile 정리
-            self.cleanup_old_lockfiles()
+            try:
+                self.cleanup_old_lockfiles()
+            except Exception as e:
+                logger.error(f"lockfile 정리 실패: {e}", exc_info=True)
             
             # 채널 검증
             await self.validate_channels()
