@@ -1,0 +1,36 @@
+# 네이버 인증 쿠키
+cookies:
+  NID_AUT: 'your_nid_aut_cookie_here'
+  NID_SES: 'your_nid_ses_cookie_here'
+
+# 녹화할 채널 ID 목록
+channels:
+  - 'channel_id_1'
+  - 'channel_id_2'
+
+# 녹화 파일 저장 설정
+output:
+  # 저장 경로
+  # {author}, {title}, {time:format} 변수 사용 가능
+  # 예: "./recordings/{author}/" 또는 "./recordings/{author}/{time:%Y%m}/"
+  path: './recordings/{author}/'
+
+  # {author}, {title}, {time:format} 변수 사용 가능.
+  # format 변수는 Python strftime 형식을 따름. {time:%Y%m%d_%H%M} -> 20260106_1430
+  filename: '{author}-{time:%Y%m%d_%H%M}.mp4'
+
+  # streamlink 품질 설정 (best, 1080p, 720p, ... , worst)
+  quality: 'best'
+
+# 모니터링 설정
+monitoring:
+  # 방송 상태 체크 간격 (초)
+  check_interval: 60
+
+  # 녹화 종료 확인 간격 (초)
+  stop_check_interval: 10
+
+# 로깅 설정
+logging:
+  # 로그 레벨 (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  level: 'INFO'

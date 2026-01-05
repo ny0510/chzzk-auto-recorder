@@ -1,0 +1,12 @@
+[project]
+name = "chzzk-auto-recoder"
+version = "1.0.0"
+description = "치지직 생방송을 자동으로 녹화합니다."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pyyaml>=6.0.3",
+    "aiohttp>=3.13.3",
+    "aiofiles>=25.1.0",
+    "colorlog>=6.8.0",
+]

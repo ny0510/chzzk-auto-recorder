@@ -1,0 +1,15 @@
+services:
+  chzzk-auto-recoder:
+    build: .
+    container_name: chzzk-auto-recoder
+    restart: unless-stopped
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./recordings:/recordings
+    environment:
+      - TZ=Asia/Seoul
+
+    logging:
+      options:
+        max-size: '10m'
+        max-file: '3'
