@@ -1,4 +1,4 @@
-# Chzzk auto recoder
+# Chzzk auto recorder
 
 ## 설정
 

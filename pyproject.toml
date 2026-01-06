@@ -1,5 +1,5 @@
 [project]
-name = "chzzk-auto-recoder"
+name = "chzzk-auto-recorder"
 version = "1.0.0"
 description = "치지직 생방송을 자동으로 녹화합니다."
 readme = "README.md"

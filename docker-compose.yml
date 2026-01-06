@@ -1,6 +1,6 @@
 services:
-  chzzk-auto-recoder:
-    container_name: chzzk-auto-recoder
+  chzzk-auto-recorder:
+    container_name: chzzk-auto-recorder
     build: .
     restart: unless-stopped
     volumes:

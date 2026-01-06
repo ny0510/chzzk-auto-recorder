@@ -110,7 +110,7 @@ wheels = [
 ]
 
 [[package]]
-name = "chzzk-auto-recoder"
+name = "chzzk-auto-recorder"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
