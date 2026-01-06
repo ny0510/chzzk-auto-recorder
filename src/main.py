@@ -210,12 +210,14 @@ class ChzzkRecorder:
                 stderr=asyncio.subprocess.PIPE
             )
             
-            # stderr 로그 출력 태스크
+            # stderr 로그 수집 및 출력 태스크
+            stderr_lines = []
             async def log_stderr():
                 if process.stderr:
                     async for line in process.stderr:
                         line_str = line.decode('utf-8', errors='ignore').strip()
                         if line_str:
+                            stderr_lines.append(line_str)
                             logger.debug(f"[{channel_name}] streamlink: {line_str}")
             
             stderr_task = asyncio.create_task(log_stderr())
@@ -231,6 +233,11 @@ class ChzzkRecorder:
             
             if process.returncode != 0:
                 logger.error(f"[{channel_name}] streamlink 오류 종료 (exit code: {process.returncode})")
+                # 최근 10줄의 stderr 출력
+                if stderr_lines:
+                    logger.error(f"[{channel_name}] streamlink 상세 오류 메시지:")
+                    for line in stderr_lines[-10:]:
+                        logger.error(f"[{channel_name}]   {line}")
             
             logger.info(f"[{channel_name}] 녹화 완료")
             
