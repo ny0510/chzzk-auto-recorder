@@ -1,6 +1,4 @@
-# Chzzk auto recorder
-
-## 설정
+# Chzzk auto recoder
 
 ### 1. 쿠키 얻기
 
