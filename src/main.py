@@ -109,7 +109,7 @@ class ChzzkRecorder:
             if lock_files:
                 logger.info(f"기존 lockfile {len(lock_files)}개 정리")
         except Exception:
-            pass  # 조용히 무시
+            pass
     
     async def monitor_channel(self, channel_id: str):
         channel_name = self.channel_names.get(channel_id, channel_id)
@@ -146,7 +146,7 @@ class ChzzkRecorder:
                     data = await response.json()
                     content = data.get('content', {})
                     
-                    # openDate 파싱 (형식: "2026-01-05 20:01:25")
+                    # openDate 파싱
                     open_date_str = content.get('openDate')
                     open_date = None
                     if open_date_str:
