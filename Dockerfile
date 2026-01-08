@@ -15,4 +15,6 @@ COPY src/ ./src/
 RUN uv sync --frozen --no-dev
 RUN uv pip install --system streamlink
 
+ENV PYTHONPATH=/app
+
 CMD ["uv", "run", "src/main.py"]
