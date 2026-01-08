@@ -230,7 +230,7 @@ class ChzzkRecorder:
             await process.wait()
             await stderr_task
             
-            if process.returncode != 0:
+            if process.returncode not in (0, 130):
                 logger.error(f"[{channel_name}] streamlink 오류 종료 (exit code: {process.returncode})")
                 # 최근 10줄의 stderr 출력
                 if stderr_lines:
