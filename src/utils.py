@@ -1,11 +1,47 @@
+import os
 from pathlib import Path
 
-def sanitize_filename(name: str) -> str:
-    """파일명에 사용할 수 없는 문자 제거"""
+def get_max_filename_length(path: str = '.') -> int:
+    """파일시스템의 최대 파일명 길이 반환 (바이트)"""
+    try:
+        # Unix/Linux/macOS에서 사용 가능
+        return os.pathconf(path, 'PC_NAME_MAX')
+    except (AttributeError, OSError, ValueError):
+        # Windows 또는 지원하지 않는 경우 기본값 반환
+        # Windows NTFS: 255, macOS APFS/HFS+: 255, Linux ext4: 255
+        return 255
+
+def sanitize_filename(name: str, target_path: str = '.', reserve_bytes: int = 50) -> str:
+    """파일명에 사용할 수 없는 문자 제거 및 길이 제한"""
+    # 잘못된 문자 제거
     invalid_chars = '<>:"/\\|?*'
     for char in invalid_chars:
         name = name.replace(char, '_')
-    return name.strip()
+    
+    name = name.strip()
+    
+    # 파일시스템의 최대 파일명 길이 가져오기
+    max_length = get_max_filename_length(target_path)
+    # 확장자 등을 위한 여유 공간 확보
+    max_bytes = max_length - reserve_bytes
+    
+    # 바이트 길이 제한 (UTF-8 기준)
+    encoded = name.encode('utf-8')
+    if len(encoded) > max_bytes:
+        # 바이트 단위로 자르되, 유효한 UTF-8 문자열 유지
+        truncated = encoded[:max_bytes]
+        # 마지막 불완전한 멀티바이트 문자 제거
+        while truncated:
+            try:
+                name = truncated.decode('utf-8')
+                # 말줄임표 추가
+                if len(name) > 3:
+                    name = name[:-3] + '...'
+                break
+            except UnicodeDecodeError:
+                truncated = truncated[:-1]
+    
+    return name
 
 def cleanup_lockfiles(base_path: str) -> int:
     """기존 lockfile 정리"""
